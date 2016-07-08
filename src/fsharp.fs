@@ -18,6 +18,7 @@ let activate(disposables: Disposable[]) =
     let p =
         Project.activate ()
         |> Promise.bind(fun _ -> Linter.activate disposables |> unbox)
+       // |> Promise.bind(fun _ -> CodeLens.activate df' disposables |> unbox)
     window.setStatusBarMessage("F# Ionide initializing", p) |> ignore
     Tooltip.activate df' disposables
     Autocomplete.activate df' disposables
@@ -28,6 +29,7 @@ let activate(disposables: Disposable[]) =
     Highlights.activate df' disposables
     Rename.activate df' disposables
     WorkspaceSymbols.activate df' disposables
+
 
     Fsi.activate disposables
     QuickInfo.activate disposables

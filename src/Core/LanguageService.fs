@@ -44,6 +44,7 @@ module LanguageService =
         ""
         |> request (url "parseProjects") 0
 
+
     let parse path (text : string) =
         let lines = text.Replace("\uFEFF", "").Split('\n')
         {ParseRequest.FileName = path; ParseRequest.Lines = lines; ParseRequest.IsAsync = true }
@@ -84,7 +85,6 @@ module LanguageService =
     let declarations fn =
         {DeclarationsRequest.FileName = fn}
         |> request (url "declarations") 0
-
 
     let declarationsProjects () =
         "" |> request (url "declarationsProjects")  0
