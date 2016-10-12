@@ -176,7 +176,6 @@ module LanguageService =
         {DeclarationsRequest.FileName = fn}
         |> request "declarations" 0 (makeRequestId())
 
-
     let declarationsProjects () =
         "" |> request "declarationsProjects" 0 (makeRequestId())
 
@@ -186,6 +185,10 @@ module LanguageService =
     let lint s =
         {ProjectRequest.FileName = s}
         |> request "lint" 0 (makeRequestId())
+
+    let codeLensRanges s =
+        {ProjectRequest.FileName = s}
+        |> request "codelensranges" 0 (makeRequestId())
 
     let start' path =
         Promise.create (fun resolve reject ->

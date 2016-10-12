@@ -12,34 +12,11 @@ open Ionide.VSCode.Helpers
 
 module CodeLens =
     let private createProvider () =
-        let mapRes (doc : TextDocument) o =
-             o.Data |> Array.collect (fun syms ->
-                let range = Range
-                                ( float syms.Declaration.BodyRange.StartLine - 1.,
-                                    float syms.Declaration.BodyRange.StartColumn - 1.,
-                                    float syms.Declaration.BodyRange.EndLine - 1.,
-                                    float syms.Declaration.BodyRange.EndColumn - 1.)
-                let cl = CodeLens(range)
-
-                let cls =  syms.Nested |> Array.choose (fun sym ->
-                    if sym.GlyphChar <> "Fc" && sym.GlyphChar <> "M" then None
-                    elif sym.Glyph = "Extension Method" then
-                        Range
-                            ( float sym.BodyRange.StartLine - 1.,
-                                float sym.BodyRange.StartColumn - (float sym.Name.Length),
-                                float sym.BodyRange.EndLine - 1.,
-                                float sym.BodyRange.EndColumn - 1.)
-                        |> CodeLens |> Some
-                    else
-                        Range
-                            ( float sym.BodyRange.StartLine - 1.,
-                                float sym.BodyRange.StartColumn - 1.,
-                                float sym.BodyRange.EndLine - 1.,
-                                float sym.BodyRange.EndColumn - 1.)
-                        |> CodeLens |> Some )
-                if syms.Declaration.GlyphChar <> "Fc" then cls
-                else
-                    cls |> Array.append (Array.create 1 cl))
+        let toEditorRange (range: CodeLensRange) =
+            Range (float range.Range.StartLine - 1.,
+                   float range.Range.StartColumn - 1.,
+                   float range.Range.EndLine - 1.,
+                   float range.Range.EndColumn - 1.)
 
         let toSingature (t : string) =
             let t =
@@ -74,10 +51,10 @@ module CodeLens =
             member this.provideCodeLenses(doc, ct) =
                 promise {
                     let! _ = LanguageService.parse doc.fileName (doc.getText())
-                    let! o = LanguageService.declarations doc.fileName
-                    let data = mapRes doc o
+                    let! result = LanguageService.codeLensRanges doc.fileName
+                    let data = Array.map (CodeLens << toEditorRange) result.Data
                     Browser.console.log("Provide", data)
-                    return data |> ResizeArray
+                    return ResizeArray data
                 } |> Case2
 
 

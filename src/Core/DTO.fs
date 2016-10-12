@@ -102,7 +102,7 @@ module DTO =
         EndLine: int
     }
 
-    type Symbol ={
+    type Symbol = {
         UniqueName: string
         Name: string
         Glyph: string
@@ -124,6 +124,9 @@ module DTO =
         Range : Range
     }
 
+    type CodeLensRange = { 
+        Range: Range 
+    }
 
     type Result<'T> = {Kind : string; Data : 'T}
     type CompilerLocationResult = Result<CompilerLocation>
@@ -136,3 +139,4 @@ module DTO =
     type MethodResult = Result<Method>
     type DeclarationResult = Result<Symbols[]>
     type LintResult = Result<Lint[]>
+    type CodeLensRangesResult = Result<CodeLensRange[]>
