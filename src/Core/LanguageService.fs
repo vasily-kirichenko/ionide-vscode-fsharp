@@ -74,15 +74,17 @@ module LanguageService =
         // At the INFO level, it's nice to see only the key data to get an overview of
         // what's happening, without being bombarded with too much detail
         let extraPropInfo =
-            if JS.isDefined (obj?FileName) then Some ", File = \"%s\"", Some (relativePathForDisplay (obj?FileName |> unbox))
-            elif JS.isDefined (obj?Project) then Some ", Project = \"%s\"", Some (relativePathForDisplay (obj?Project |> unbox))
-            elif JS.isDefined (obj?Symbol) then Some ", Symbol = \"%s\"", Some (obj?Symbol |> unbox)
-            else None, None
+            if JS.isDefined (obj?FileName) then sprintf ", File = \"%s\"" (relativePathForDisplay (obj?FileName |> unbox))
+            elif JS.isDefined (obj?Project) then sprintf ", Project = \"%s\"" (relativePathForDisplay (obj?Project |> unbox))
+            elif JS.isDefined (obj?Symbol) then sprintf ", Symbol = \"%s\"" (obj?Symbol |> unbox)
+            else ""
 
-        match extraPropInfo with
-        | None, None -> log.Info (makeOutgoingLogPrefix(requestId) + " {%s}", fsacAction)
-        | Some extraTmpl, Some extraArg -> log.Info (makeOutgoingLogPrefix(requestId) + " {%s}" + extraTmpl, fsacAction, extraArg)
-        | _, _ -> failwithf "cannot happen %A" extraPropInfo
+        let pos = 
+            if JS.isDefined (obj?Line) && JS.isDefined (obj?Column) then 
+                sprintf ", Line = %d, Col = %d" (obj?Line |> unbox) (obj?Column |> unbox)
+            else ""
+
+        log.Info (makeOutgoingLogPrefix(requestId) + " {%s} {%s}", fsacAction, extraPropInfo + pos)
 
     let private logIncomingResponse requestId fsacAction (started: DateTime) (r: Axios.AxiosXHR<_>) (res: _ option) (ex: exn option) =
         let elapsed = DateTime.Now - started
